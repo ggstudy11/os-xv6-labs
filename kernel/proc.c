@@ -654,3 +654,32 @@ procdump(void)
     printf("\n");
   }
 }
+
+uint64
+get_proc_num (void) {
+  struct proc *p;
+  uint64 num = 0;
+  for (p = proc; p < &proc[NPROC]; p++) {
+    acquire(&p->lock);
+    if (p->state == UNUSED) {
+      num++;
+    }
+    release(&p->lock);
+  }
+  return num;
+}
+
+uint64
+get_free_fd(void)
+{
+
+  uint64 num = 0;
+  int fd;
+  struct proc *p = myproc();
+  for( fd = 0; fd < NOFILE; ++fd) {
+    if(p->ofile[fd] == 0) {
+      ++num;
+    }
+  }
+  return num;
+}
