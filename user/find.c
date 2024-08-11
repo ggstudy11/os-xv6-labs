@@ -64,9 +64,6 @@ void find(char* dir, char* file) {
     {
         if(de.inum == 0)
             continue;
-        // strcmp(s, t);
-        // 根据 s 指向的字符串小于（s<t）、等于（s==t）或大于（s>t） t 指向的字符串的不同情况
-        // 分别返回负整数、0或正整数
         // 不要递归 "." 和 "..."
         if (!strcmp(de.name, ".") || !strcmp(de.name, ".."))
             continue;
@@ -74,10 +71,6 @@ void find(char* dir, char* file) {
         memmove(p, de.name, DIRSIZ);
         // 设置文件名结束符
         p[DIRSIZ] = 0;
-        // int stat(char *, struct stat *);
-        // stat 系统调用，可以获得一个已存在文件的模式，并将此模式赋值给它的副本
-        // stat 以文件名作为参数，返回文件的 i 结点中的所有信息
-        // 如果出错，则返回 -1
         if(stat(buf, &st) < 0)
         {
             // 出错则报错
@@ -96,7 +89,6 @@ void find(char* dir, char* file) {
             printf("%s\n", buf);
         } 
     }
-
 }
 
 int main(int argc, char** argv)

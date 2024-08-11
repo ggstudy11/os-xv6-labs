@@ -54,6 +54,7 @@ void primes(int p[], int t[])
                     write(t[1], &next, sizeof(int));
                 }
             }
+            
             close(t[1]); // close write end of t
 
             while (read(t[0], &next, sizeof(int)) > 0) {
