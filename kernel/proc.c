@@ -288,6 +288,7 @@ fork(void)
     return -1;
   }
   np->sz = p->sz;
+  np->mask = p->mask;
 
   // copy saved user registers.
   *(np->trapframe) = *(p->trapframe);
@@ -658,13 +659,14 @@ procdump(void)
 uint64
 get_proc_num (void) {
   struct proc *p;
+  // proc num
   uint64 num = 0;
   for (p = proc; p < &proc[NPROC]; p++) {
-    acquire(&p->lock);
-    if (p->state == UNUSED) {
+    acquire(&p->lock); // lock
+    if (p->state != UNUSED) {
       num++;
-    }
-    release(&p->lock);
+    } // proc
+    release(&p->lock); // release
   }
   return num;
 }

@@ -103,8 +103,10 @@ uint64
 sys_trace(void)
 {
   int mask;
+  // reg 0 to mask
   if( argint(0, &mask) < 0) 
     return -1;
+  // cur proc mask 
   myproc() -> mask = mask;
   return 0;
 }
@@ -112,10 +114,12 @@ sys_trace(void)
 uint64
 sys_sysinfo(void)
 {
+  // 
   uint64 addr;
   if (argaddr(0, &addr) < 0) {
     return -1;
   }
+  // sysinfo
   struct sysinfo info;
   info.freemem = get_free_mem();
   info.nproc = get_proc_num();
