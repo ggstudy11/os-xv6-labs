@@ -8,7 +8,8 @@
 
 /*
  * the kernel's page table.
- */
+*/
+
 pagetable_t kernel_pagetable;
 
 extern char etext[];  // kernel.ld sets this to end of kernel code.
@@ -431,4 +432,36 @@ copyinstr(pagetable_t pagetable, char *dst, uint64 srcva, uint64 max)
   } else {
     return -1;
   }
+}
+void 
+printwalk(pagetable_t pagetable, uint level)
+{
+  char* point;
+  switch (level) 
+  {
+    case 2:
+      point = "..";
+      break;
+    case 1:
+      point = ".. ..";
+      break;
+    default:
+      point = ".. .. ..";
+  }
+  for ( int i = 0; i < 512; ++i) {
+    pte_t pte = pagetable[i];
+    if (pte & PTE_V) {
+      uint64 pa = PTE2PA(pte);
+      printf("%s%d: pte %p pa %p\n", point, i, pte, pa);
+      if ((pte & (PTE_R | PTE_W | PTE_X)) == 0) {
+        printwalk((pagetable_t)pa, level - 1);
+      }
+    }
+  }
+}
+void
+vmprint(pagetable_t pagetable)
+{
+  printf("page table %p\n", pagetable);
+  printwalk(pagetable, 2);
 }

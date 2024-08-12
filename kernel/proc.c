@@ -134,6 +134,7 @@ found:
     return 0;
   }
 
+  memmove(p->usyscall, &p->pid, 8);
   // An empty user page table.
   p->pagetable = proc_pagetable(p);
   if(p->pagetable == 0){
@@ -207,12 +208,13 @@ proc_pagetable(struct proc *p)
   }
 
   if (mappages(pagetable, USYSCALL, PGSIZE,
-              (uint64)(p->usyscall), PTE_R | PTE_W) < 0) {
+              (uint64)(p->usyscall), PTE_R | PTE_U) < 0) {
     uvmunmap(pagetable, TRAMPOLINE, 1, 0);
     uvmunmap(pagetable, TRAPFRAME, 1, 0);
     uvmfree(pagetable, 0);
     return 0;
   }
+
   return pagetable;
 }
 
