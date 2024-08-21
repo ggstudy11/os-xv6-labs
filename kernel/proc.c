@@ -671,17 +671,3 @@ get_proc_num (void) {
   return num;
 }
 
-uint64
-get_free_fd(void)
-{
-
-  uint64 num = 0;
-  int fd;
-  struct proc *p = myproc();
-  for( fd = 0; fd < NOFILE; ++fd) {
-    if(p->ofile[fd] == 0) {
-      ++num;
-    }
-  }
-  return num;
-}

@@ -114,7 +114,7 @@ sys_trace(void)
 uint64
 sys_sysinfo(void)
 {
-  // 
+  // virtual addr
   uint64 addr;
   if (argaddr(0, &addr) < 0) {
     return -1;
