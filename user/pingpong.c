@@ -27,13 +27,16 @@ int main(int argc, char** argv)
     if(pid == 0){
         // child
         read(fd1[0], buf, 4); // read
+        close(fd1[0]);
         printf("%d: received %s\n", getpid(), buf); // print msg
         write(fd2[1], "pong", 4); // write
-
+        close(fd2[1]);
     } else {
         // parent
         write(fd1[1], "ping", 4); // write
+        close(fd1[1]);
         read(fd2[0], buf, 4); // read
+        close(fd2[0]);
         wait(0); // no confict in output
         printf("%d: received %s\n", getpid(), buf); // print msg
     }
