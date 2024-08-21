@@ -207,6 +207,7 @@ proc_pagetable(struct proc *p)
     return 0;
   }
 
+  // page for usyscall
   if (mappages(pagetable, USYSCALL, PGSIZE,
               (uint64)(p->usyscall), PTE_R | PTE_U) < 0) {
     uvmunmap(pagetable, TRAMPOLINE, 1, 0);

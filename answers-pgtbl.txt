@@ -1,1 +1,1 @@
-11
+some systemcall need trap to use the msg in the kernel so it will speed up
