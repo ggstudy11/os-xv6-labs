@@ -437,6 +437,7 @@ void
 printwalk(pagetable_t pagetable, uint level)
 {
   char* point;
+  // level
   switch (level) 
   {
     case 2:
@@ -448,6 +449,7 @@ printwalk(pagetable_t pagetable, uint level)
     default:
       point = ".. .. ..";
   }
+  // walk pa phsical addr
   for ( int i = 0; i < 512; ++i) {
     pte_t pte = pagetable[i];
     if (pte & PTE_V) {
