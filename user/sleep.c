@@ -10,12 +10,12 @@ int main(int argc, char** argv)
     int ticks;
 
     if (argc <= 1) {
-        fprintf(2, "usage: sleep n(ticks)\n");
+        fprintf(2, "usage: sleep n(ticks)\n"); // cmd output
         // error exit
         exit(1);
     }
 
-    // string to num
+    // convert string to num
     ticks = atoi(argv[1]);
     // sys sleep
     sleep(ticks);
