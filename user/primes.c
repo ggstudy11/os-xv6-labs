@@ -10,7 +10,7 @@ int main(int argc, char** argv)
     // pipe
     pipe(p);
 
-    int t[2];
+    int t[2]; // for temp
     pipe(t);
 
     // create a child process
@@ -43,7 +43,9 @@ void primes(int p[], int t[])
         printf("prime %d\n", pre);
         
         // create a child process
-        int pid = fork();
+        int pid = fork();\
+
+
         if (pid == 0) {
             // child process
             close(p[0]); // close read end of p
