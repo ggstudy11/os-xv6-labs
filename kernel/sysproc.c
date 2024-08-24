@@ -93,15 +93,20 @@ sys_pgaccess(void)
  
   if(argaddr(0, &base) < 0 || argint(1, &len) < 0 || argaddr(2, &mask) < 0)
     return -1;
+  
+  // the limit of len
   if (len > sizeof(int)*8) 
     len = sizeof(int)*8;
  
-  for(int i=0; i<len; i++) {
+  // for in len
+  for(int i = 0; i < len; i++) {
     pagetable = p->pagetable;
       
+    // out of limit
     if(base >= MAXVA)
       panic("pgaccess");
  
+    // walk
     for(int level = 2; level > 0; level--) {
       pte = &pagetable[PX(level, base)];
       if(*pte & PTE_V) {
@@ -110,23 +115,27 @@ sys_pgaccess(void)
         return -1;
       }      
     }
-    pte = &pagetable[PX(0, base)];
-    if(pte == 0)
-      return -1;
-    if((*pte & PTE_V) == 0)
-      return -1;
-    if((*pte & PTE_U) == 0)
-      return -1;  
-    if(*pte & PTE_A) {  
-      procmask = procmask | (1L << i);
-      *pte = *pte & (~PTE_A);
+      pte = &pagetable[PX(0, base)];
+      if(pte == 0)
+        return -1;
+      if((*pte & PTE_V) == 0)
+        return -1;
+      if((*pte & PTE_U) == 0)
+        return -1;  
+      if(*pte & PTE_A) {  
+        procmask = procmask | (1L << i);
+        *pte = *pte & (~PTE_A);
     }
+
+    // page addr 
     base += PGSIZE;
   }
  
   pagetable = p->pagetable;
-  return copyout(pagetable, mask, (char *) &procmask, sizeof(unsigned int));
-  
+  if(copyout(pagetable, mask, (char *) &procmask, sizeof(unsigned int)) < 0){
+    panic("sys_pgaccess copyout error");
+  };
+  return 0;
 }
 #endif
 
