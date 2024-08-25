@@ -80,12 +80,15 @@ usertrap(void)
   if(which_dev == 2) {
 
     if(p->alarm_interval !=0 && ++p->pticks == p->alarm_interval&&!p->is_alarming) {
-      p->pticks = 0;
+      
       p->trapframe_copy = p->trapframe + 512;
-      p->is_alarming = 1;
       memmove(p->trapframe_copy, p->trapframe, sizeof(struct trapframe));
+      p->pticks = 0; // passed ticks set zero
+      p->is_alarming = 1; // is alarming
       p->trapframe->epc = (uint64)p->alarm_handle;
+    
     }
+
     yield();
   }
   usertrapret();

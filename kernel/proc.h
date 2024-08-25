@@ -106,10 +106,11 @@ struct proc {
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
 
-  int alarm_interval;           // interval
+  int alarm_interval;         // interval
   uint64 alarm_handle;        // pter func
-  int pticks;           // passed tick
+  int pticks;                 // passed tick
 
   struct trapframe* trapframe_copy; // copy page for covery
-  int is_alarming;          
+  int    is_alarming;               // show if alarming
+
 };
