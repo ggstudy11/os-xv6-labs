@@ -18,21 +18,23 @@ struct run {
   struct run *next;
 };
 
+// N CPU freelist with spinlock
 struct {
   struct spinlock lock;
   struct run *freelist;
+  char lockname[8]; // lock name
 } kmem[NCPU];
 
 void
 kinit()
 {
 
-  char lockname[8];
   for(int i = 0; i < NCPU; i++){
-    snprintf(lockname, sizeof(lockname), "kmem_%d", i);
-    initlock(&kmem[i].lock, lockname);
+    snprintf(kmem[i].lockname, sizeof(kmem[i].lockname), "kmem_%d", i);
+    initlock(&kmem[i].lock, kmem[i].lockname);
   }
   freerange(end, (void*)PHYSTOP);
+
 }
 
 
@@ -62,6 +64,7 @@ kfree(void *pa)
 
   r = (struct run*)pa;
 
+  // down the 
   push_off();
   int id = cpuid();
   acquire(&kmem[id].lock);
