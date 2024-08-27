@@ -24,7 +24,7 @@
 #include "buf.h"
 
 #define NBUCKET 13
-#define HASH(id) (id % NBUCKET)
+#define HASH(id) (id % NBUCKET) // bucket id
 
 struct hashbuf{
   struct buf head;
@@ -37,6 +37,9 @@ struct {
   // Linked list of all buffers, through prev/next.
   // Sorted by how recently the buffer was used.
   // head.next is most recent, head.prev is least.
+
+  // head.next head.prev and 
+
   struct hashbuf buckets[NBUCKET];
  
 } bcache;
@@ -47,7 +50,9 @@ binit(void)
   struct buf *b;
   char lockname[8];
 
+  // init lock
   for(int i = 0; i < NBUCKET; ++i) {
+
     snprintf(lockname, sizeof(lockname), "banch_%d", i);
     initlock(&bcache.buckets[i].lock, lockname);
 
@@ -56,6 +61,7 @@ binit(void)
 
   }
 
+  // init cpu0 
   for(b = bcache.buf; b < bcache.buf+NBUF; b++){
     b->next = bcache.buckets[0].head.next;
     b->prev = &bcache.buckets[0].head;
@@ -76,7 +82,7 @@ bget(uint dev, uint blockno)
   int bid = HASH(blockno);
   acquire(&bcache.buckets[bid].lock);
 
-  // Is the block already cached?
+  // if in
   for(b = bcache.buckets[bid].head.next; b != &bcache.buckets[bid].head; b = b->next){
     if(b->dev == dev && b->blockno == blockno){
       b->refcnt++;
@@ -91,14 +97,11 @@ bget(uint dev, uint blockno)
     }
   }
 
-  // Not cached.
   b = 0;
   struct buf *tmp;
-   // Recycle the least recently used (LRU) unused buffer.
-  // 从当前散列桶开始查找
+  // Recycle the least recently used (LRU) unused buffer.
   for(int i = bid, cycle = 0; cycle != NBUCKET; i = (i + 1) % NBUCKET) {
     ++cycle;
-    // 如果遍历到当前散列桶，则不重新获取锁
     if(i != bid) {
       if(!holding(&bcache.buckets[i].lock))
         acquire(&bcache.buckets[i].lock);
@@ -111,7 +114,6 @@ bget(uint dev, uint blockno)
         b = tmp;
 
     if(b) {
-      // 如果是从其他散列桶窃取的，则将其以头插法插入到当前桶
       if(i != bid) {
         b->next->prev = b->prev;
         b->prev->next = b->next;
@@ -136,7 +138,6 @@ bget(uint dev, uint blockno)
       acquiresleep(&b->lock);
       return b;
     } else {
-      // 在当前散列桶中未找到，则直接释放锁
       if(i != bid)
         release(&bcache.buckets[i].lock);
     }
@@ -176,13 +177,14 @@ brelse(struct buf *b)
   if(!holdingsleep(&b->lock))
     panic("brelse");
 
-  int bid = HASH(b->blockno);
+  int bid = HASH(b->blockno); // cpu num
 
   releasesleep(&b->lock);
 
   acquire(&bcache.buckets[bid].lock);
   b->refcnt--;
 
+  // get ticks
   acquire(&tickslock);
   b->timestamp = ticks;
   release(&tickslock);
