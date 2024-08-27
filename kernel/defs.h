@@ -184,3 +184,8 @@ void            virtio_disk_intr(void);
 
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))
+
+pte_t *walk(pagetable_t, uint64, int);
+
+uint64 pgfault(uint64);
+uint64 subunmap(uint64, int);

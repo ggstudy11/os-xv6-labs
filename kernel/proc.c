@@ -140,6 +140,7 @@ found:
   memset(&p->context, 0, sizeof(p->context));
   p->context.ra = (uint64)forkret;
   p->context.sp = p->kstack + PGSIZE;
+  p->curend = MAXVA - 2 * PGSIZE;
 
   return p;
 }
@@ -315,6 +316,14 @@ fork(void)
   np->state = RUNNABLE;
   release(&np->lock);
 
+  memmove(np->vma, p->vma, sizeof(struct vma_t));
+    np->curend = p->curend;
+    // 注意文件计数加 1
+    for (int i = 0; i < MAXVMA; ++i) {
+        if (np->vma[i].valid == 1)
+            filedup(np->vma[i].f);
+    }
+
   return pid;
 }
 
@@ -344,6 +353,11 @@ exit(int status)
   if(p == initproc)
     panic("init exiting");
 
+  for (int i = 0; i < MAXVMA; ++i) {
+      if (p->vma[i].valid == 1)
+          subunmap(p->vma[i].va, p->vma[i].len);
+  }
+  
   // Close all open files.
   for(int fd = 0; fd < NOFILE; fd++){
     if(p->ofile[fd]){

@@ -80,6 +80,19 @@ struct trapframe {
   /* 280 */ uint64 t6;
 };
 
+#define MAXVMA 16
+
+struct vma_t {
+    int valid;// 1 表示有效；0 表示无效即可使用
+    uint64 va;
+    uint len;
+    int  prot;
+    int  flags;
+    int  fd;
+    long off;
+    struct file *f;
+};
+
 enum procstate { UNUSED, USED, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 
 // Per-process state
@@ -105,4 +118,7 @@ struct proc {
   struct file *ofile[NOFILE];  // Open files
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
+
+  struct vma_t vma[MAXVMA];
+  uint64 curend;
 };
