@@ -43,6 +43,8 @@ binit(void)
   // Create linked list of buffers
   bcache.head.prev = &bcache.head;
   bcache.head.next = &bcache.head;
+
+  // for the buf list for LRU
   for(b = bcache.buf; b < bcache.buf+NBUF; b++){
     b->next = bcache.head.next;
     b->prev = &bcache.head;
@@ -85,6 +87,7 @@ bget(uint dev, uint blockno)
       return b;
     }
   }
+  
   panic("bget: no buffers");
 }
 

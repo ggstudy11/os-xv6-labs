@@ -374,6 +374,8 @@ iunlockput(struct inode *ip)
 
 // Return the disk block address of the nth block in inode ip.
 // If there is no such block, bmap allocates one.
+
+// bn 's data
 static uint
 bmap(struct inode *ip, uint bn)
 {
@@ -381,12 +383,15 @@ bmap(struct inode *ip, uint bn)
   struct buf *bp;
 
   if(bn < NDIRECT){
+    // no exits
     if((addr = ip->addrs[bn]) == 0)
-      ip->addrs[bn] = addr = balloc(ip->dev);
+      ip->addrs[bn] = addr = balloc(ip->dev); // alloc block
     return addr;
   }
   bn -= NDIRECT;
 
+
+  // second
   if(bn < NINDIRECT){
     // Load indirect block, allocating if necessary.
     if((addr = ip->addrs[NDIRECT]) == 0)
@@ -402,6 +407,7 @@ bmap(struct inode *ip, uint bn)
   }
   bn -= NINDIRECT;
 
+  // second second
   if(bn < NDINDIRECT) {
     int level2_idx = bn / NADDR_PER_BLOCK; // l2 loc
     int level1_idx = bn % NADDR_PER_BLOCK; // l1 loc
@@ -444,16 +450,18 @@ itrunc(struct inode *ip)
   struct buf *bp;
   uint *a;
 
+  // direct block
   for(i = 0; i < NDIRECT; i++){
     if(ip->addrs[i]){
       bfree(ip->dev, ip->addrs[i]);
       ip->addrs[i] = 0;
     }
   }
-
+  
   struct buf* bp1;
   uint* a1;
 
+  // first 
   if(ip->addrs[NDIRECT + 1]){
     bp = bread(ip->dev, ip->addrs[NDIRECT + 1]);
     a = (uint*)bp->data;
